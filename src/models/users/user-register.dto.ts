@@ -1,22 +1,19 @@
-import { IsEmail, IsString, Matches, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsString, Matches } from 'class-validator';
 
-export class RegisterUserDTO {
+export class UserRegisterDTO {
   @IsString()
-  @MinLength(3)
   username: string;
-
-  @IsString()
-  @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/)
-  password: string;
 
   @IsEmail()
   email: string;
 
   @IsString()
-  @MinLength(2)
+  @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/)
+  password: string;
+
+  @IsString()
   firstName: string;
 
   @IsString()
-  @MinLength(2)
   lastName: string;
 }

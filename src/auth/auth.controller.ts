@@ -1,49 +1,46 @@
-import { AuthGuardWithBlackisting } from './../common/guards/custom-auth.guard';
-import { LoginUserDto } from '../models/users/login-user.dto';
-import { UserDto } from '../models/users/user.dto';
-import {
-  Controller,
-  ValidationPipe,
-  Body,
-  Post,
-  BadRequestException,
-  Get,
-  UseGuards,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, Post, Body, ValidationPipe, BadRequestException, Delete, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../core/services/users.service';
-import { RegisterUserDTO } from '../models/users/register-user.dto';
-import { BadRequestFilter } from '../common/filters/bad-request.filter';
-import { NotFoundFilter } from '../common/filters/not-found.filter';
-import { Token } from '../decorators/token.decorator';
+import { UserRegisterDTO } from '../models/users/user-register.dto';
+import { ShowUserDTO } from '../models/users/show-user.dto';
+import { UserLoginDTO } from '../models/users/user-login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
-@UseFilters(BadRequestFilter, NotFoundFilter)
-@Controller('api')
+@Controller('api/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
   ) {}
 
-  @Post('register')
-  async register(@Body(new ValidationPipe({ transform: true, whitelist: true })) userData: RegisterUserDTO): Promise<UserDto> {
-      return await this.usersService.register(userData);
-  }
+  @Post('users')
+  async register(@Body(new ValidationPipe({ whitelist: true, transform: true })) user: UserRegisterDTO): Promise<ShowUserDTO> {
 
-  @Post('login')
-  async login(@Body(new ValidationPipe({ transform: true, whitelist: true })) userData: LoginUserDto): Promise<{ token: string }> {
-    const token = await this.authService.signIn(userData);
-    if (!token) {
-      throw new BadRequestException(`Wrong credentials!`);
+    if (!!(await this.authService.validateIfUserExists(user.email))) {
+      throw new BadRequestException('User with such email already exists!');
     }
 
-    return { token };
+    return await this.usersService.register(user);
   }
 
-  @UseGuards(AuthGuardWithBlackisting)
-  @Get('logout')
-  logout(@Token() token: string): Promise<{ message: string }> {
-      return this.authService.logout(token);
+  @Post('session')
+  async login(@Body() user: UserLoginDTO): Promise<{user: ShowUserDTO, token: string}> {
+    const authObject = await this.authService.login(user);
+
+    if (!(await this.authService.validateIfUserExists(user.email))) {
+      throw new BadRequestException('User with such email does not exist!');
+    }
+
+    if (!(await this.authService.validateUserPassword(user))) {
+      throw new BadRequestException('Invalid password!');
+    }
+
+    return authObject;
+  }
+
+  @Delete('session')
+  @UseGuards(AuthGuard())
+  async logoutUser() {
+    return 'Successful logout!';
   }
 }

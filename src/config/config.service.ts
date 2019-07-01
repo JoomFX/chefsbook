@@ -36,9 +36,6 @@ export class ConfigService {
       DB_USERNAME: Joi.string().default('root'),
       DB_PASSWORD: Joi.string().default('root'),
       DB_DATABASE_NAME: Joi.string().required(),
-      REDIS_HOST: Joi.string().default('127.0.0.1'),
-      REDIS_PORT: Joi.number().default(6379),
-      REDIS_PASSWORD: Joi.string().default('root'),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
@@ -85,17 +82,5 @@ export class ConfigService {
 
   public get dbType(): DatabaseType {
     return this.envConfig.DB_TYPE as DatabaseType;
-  }
-
-  public get redisHost(): string {
-    return this.envConfig.REDIS_HOST;
-  }
-
-  public get redisPort(): number {
-    return +this.envConfig.REDIS_PORT;
-  }
-
-  public get redisPassword(): string {
-    return this.envConfig.REDIS_PASSWORD;
   }
 }

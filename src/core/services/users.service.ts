@@ -4,97 +4,77 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from '../../data/entities/user.entity';
-import { UserDto } from '../../models/users/user.dto';
-import { LoginUserDto } from '../../models/users/login-user.dto';
-import { RegisterUserDTO } from '../../models/users/register-user.dto';
-import { JwtPayload } from '../../common/interfaces/jwt-payload';
-import { UserBadRequest } from '../../common/exeptions/user-bad-request';
-import { UserNotFound } from '../../common/exeptions/user-not-found';
+import { ShowUserDTO } from '../../models/users/show-user.dto';
+import { UserRegisterDTO } from '../../models/users/user-register.dto';
+import { UserLoginDTO } from '../../models/users/user-login.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
-  async register(userData: RegisterUserDTO): Promise<UserDto> {
-    const userByUsername = await this.userRepo.findOne({
-      where: { username: userData.username },
-    });
-    if (userByUsername) {
-      throw new UserBadRequest('This username is already taken!');
-    }
-    const userByEmail = await this.userRepo.findOne({
-      where: { email: userData.email },
-    });
-    if (userByEmail) {
-      throw new UserBadRequest('This email is already used!');
-    }
-    const passwordHash = await bcrypt.hash(userData.password, 10);
+  async register(user: UserRegisterDTO): Promise<ShowUserDTO> {
+    const newUser: User = this.usersRepository.create(user);
 
-    const savedUser = await this.userRepo.save({
-      ...userData,
-      password: passwordHash,
-    });
+    const passwordHash = await bcrypt.hash(user.password, 10);
+    newUser.password = passwordHash;
 
-    return this.userToRO(savedUser);
+    const savedUser = await this.usersRepository.save(newUser);
+
+    return this.convertToShowUserDTO(savedUser);
   }
 
-  async signIn(username: string): Promise<User> {
-    const user = await this.userRepo.findOne({
-      where: { username },
+  async findUserByEmail(email: string): Promise<ShowUserDTO> | undefined {
+    const foundUser = await this.usersRepository.findOne({
+      where: {
+        email,
+      },
     });
-    if (!user) {
-      throw new UserNotFound(`User with username ${username} does not exist!`);
+
+    if (!foundUser) {
+      return undefined;
     }
 
-    return user;
+    return this.convertToShowUserDTO(foundUser);
   }
 
-  async findByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepo.findOne({
-      where: { username },
+  async findUserByUsername(username: string): Promise<ShowUserDTO> | undefined {
+    const foundUser = await this.usersRepository.findOne({
+      where: {
+        username,
+      },
     });
-    if (!user) {
-      throw new UserNotFound(`User with username ${username} does not exist!`);
+
+    if (!foundUser) {
+      return undefined;
     }
 
-    return this.userToRO(user);
+    return this.convertToShowUserDTO(foundUser);
   }
 
-  async findByEmail(email: string): Promise<UserDto> {
-    const user = await this.userRepo.findOne({
-      where: { email },
-    });
-    if (!user) {
-      throw new UserNotFound(`User with email ${email} does not exist!`);
-    }
-
-    return this.userToRO(user);
-  }
-
-  async validate(payload: JwtPayload): Promise<User> {
-    return await this.userRepo.findOne({
-      where: { ...payload },
-    });
-  }
-
-  async validatePassword(user: LoginUserDto): Promise<boolean> {
-    const userEntity = await this.userRepo.findOne({
-      where: { username: user.username },
+  async validateUserPassword(user: UserLoginDTO): Promise<boolean> {
+    const userEntity = await this.usersRepository.findOne({
+      where: {
+        email: user.email,
+      },
     });
 
     return await bcrypt.compare(user.password, userEntity.password);
   }
 
-  private userToRO(user: User) {
-    const userRO = {
+  private async convertToShowUserDTO(user: User): Promise<ShowUserDTO> {
+
+    const convertedUser: ShowUserDTO = {
       id: user.id,
       username: user.username,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      joined: user.joined,
+      createdOn: user.joined,
     };
 
-    return { user: userRO };
+    return convertedUser;
   }
 }

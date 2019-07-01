@@ -1,10 +1,9 @@
-import { Controller, UseFilters, UseGuards, Get, Query } from '@nestjs/common';
-
-import { AuthGuardWithBlackisting } from '../common/guards/custom-auth.guard';
+import { Controller, UseGuards, Get, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductQueryDto } from '../models/products/product-query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuardWithBlackisting)
+@UseGuards(AuthGuard())
 @Controller('api/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}

@@ -1,47 +1,34 @@
-import { UserBadRequest } from './../common/exeptions/user-bad-request';
-import { JwtPayload } from '../common/interfaces/jwt-payload';
-import { LoginUserDto } from '../models/users/login-user.dto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../core/services/users.service';
-import { User } from '../data/entities/user.entity';
+import { UserLoginDTO } from '../models/users/user-login.dto';
+import { ShowUserDTO } from '../models/users/show-user.dto';
+import { UserRegisterDTO } from '../models/users/user-register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
-  async signIn(userData: LoginUserDto): Promise<string> {
-    const { username } = userData;
-    const user = await this.usersService.signIn(username);
-    if (!user) {
-      throw new UserBadRequest(`No such user`);
-    }
-    const isPasswordValid = await this.usersService.validatePassword(userData);
-    if (!isPasswordValid) {
-      throw new UserBadRequest(`Passdowrd doesn't match`);
-    }
-    const userPayload: JwtPayload = { username: user.username };
+  async login(user: UserLoginDTO): Promise<{user: ShowUserDTO, token: string}> {
+    const userFound = await this.usersService.findUserByEmail(user.email);
 
-    return await this.jwtService.sign(userPayload);
+    const token = await this.jwtService.sign({email: userFound.email});
+
+    return { user: userFound, token };
   }
 
-  async validateUser(payload: JwtPayload): Promise<User> {
-    return await this.usersService.validate(payload);
+  async register(user: UserRegisterDTO): Promise<ShowUserDTO> {
+    return await this.usersService.register(user);
   }
 
-  async logout(token: string): Promise<{ message: string }> {
-    return { message: 'User successfully logged out'};
+  async validateIfUserExists(email: string): Promise<ShowUserDTO> | undefined {
+    return await this.usersService.findUserByEmail(email);
   }
 
-  // async isTokenBlacklisted(token: string): Promise<boolean> {
-  //   const client = await this.redisService.getClient();
-  //   const key = 'token';
-  //   const allTokens: string[] = await client.lrange(key, 0, -1);
-  //   const isBlacklisted = allTokens.includes(token);
-
-  //   return isBlacklisted;
-  // }
+  async validateUserPassword(user: UserLoginDTO): Promise<boolean> {
+    return await this.usersService.validateUserPassword(user);
+  }
 }
