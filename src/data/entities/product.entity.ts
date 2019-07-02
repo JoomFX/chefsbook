@@ -1,4 +1,4 @@
-import { RecipeProduct } from './recipe-product';
+import { Ingredient } from './ingredient.entity';
 import { Entity, PrimaryColumn, Column,  OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Measure } from './measure.entity';
 import { Nutrition } from './nutrition.entity';
@@ -37,6 +37,6 @@ export class Product {
   /**
    * Recipe product
    */
-  @OneToMany(type => RecipeProduct, recipeProduct => recipeProduct.product)
-  recipeProducts: Promise<RecipeProduct[]>;
+  @OneToMany(type => Ingredient, ingredient => ingredient.product)
+  ingredients: Promise<Ingredient[]>;
 }

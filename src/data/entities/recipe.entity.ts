@@ -1,8 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToOne, OneToMany } from 'typeorm';
-
-import { RecipeProduct } from './recipe-product';
 import { User } from './user.entity';
 import { Nutrition } from './nutrition.entity';
+import { Ingredient } from './ingredient.entity';
 
 /**
  * Recipe entity
@@ -30,10 +29,10 @@ export class Recipe {
   @ManyToOne(type => User, user => user.recipes)
   author: Promise<User>;
   /**
-   * Products in the recipe
+   * Ingredients in the recipe
    */
-  @OneToMany(type => RecipeProduct, recipeProduct => recipeProduct.recipes, { eager: true })
-  recipeProducts: RecipeProduct[];
+  @OneToMany(type => Ingredient, ingredient => ingredient.recipe, { eager: true })
+  ingredients: Ingredient[];
   /**
    * Subrecipes in the recipe
    */

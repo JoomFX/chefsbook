@@ -26,7 +26,7 @@ export class ProductsService {
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.measures', 'measure')
       .leftJoinAndSelect('product.nutrition', 'nutrition')
-      .leftJoin('product.recipeProducts', 'recipeProducts')
+      .leftJoin('product.ingredients', 'ingredients')
       .addOrderBy('product.description', 'ASC');
 
     if (description) {

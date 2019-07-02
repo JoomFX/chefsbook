@@ -26,6 +26,7 @@ import { ProductsModule } from './products/products.module';
         database: configService.dbName,
         entities: ['./src/data/entities/*.ts'],
         subscribers: ['./src/common/subscribers/*.ts'],
+        // synchronize: true,
       }),
     }),
     ProductsModule,
