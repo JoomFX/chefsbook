@@ -1,10 +1,6 @@
-import { ProductRO } from './product-ro';
+import { ShowProductDTO } from './show-product.dto';
 
-export class ProductsDto {
-  products: ProductRO[];
-  page: number;
-  productsCount: number;
-  totalProducts: number;
-  next?: string;
-  previous?: string;
+export class ProductsDTO {
+  products: ShowProductDTO[];
+  count: number;
 }

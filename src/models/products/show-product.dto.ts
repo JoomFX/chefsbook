@@ -1,7 +1,8 @@
-import { INutrition } from '../../common/interfaces/nutrition';
 import { IMeasure } from '../../common/interfaces/measure';
+import { INutrition } from '../../common/interfaces/nutrition';
 
-export interface ProductRO {
+export class ShowProductDTO {
+  code: number;
   description: string;
   foodGroup: string;
   measures: IMeasure[];

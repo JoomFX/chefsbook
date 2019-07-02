@@ -1,17 +1,17 @@
 import { Controller, UseGuards, Get, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { ProductQueryDto } from '../models/products/product-query.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ProductsDTO } from '../models/products/products.dto';
 
 @UseGuards(AuthGuard())
 @Controller('api/products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+  ) {}
 
   @Get()
-  async getProducts(@Query() query: ProductQueryDto) {
-    const route: string = `localhost:3000/api/products`;
-
-    return this.productsService.getProducts(query, route);
+  async findAll(@Query('page') page, @Query('search') search): Promise<ProductsDTO> {
+    return await this.productsService.findAll(page, search);
   }
 }
