@@ -11,7 +11,11 @@ export class ProductsController {
   ) {}
 
   @Get()
-  async findAll(@Query('page') page, @Query('search') search): Promise<ProductsDTO> {
-    return await this.productsService.findAll(page, search);
+  async findAll(
+    @Query('page') page,
+    @Query('search') search,
+    @Query('foodGroup') foodGroup,
+  ): Promise<ProductsDTO> {
+    return await this.productsService.findAll(page, search, foodGroup);
   }
 }

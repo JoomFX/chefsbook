@@ -13,50 +13,45 @@ export class ProductsService {
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,
   ) {}
 
-  async findAll(page: number = 1, search: string): Promise<ProductsDTO> {
-    const productsPerPage = 20;
+  async findAll(page: number = 1, search: string, foodGroup: string): Promise<ProductsDTO> {
+    const productsPerPage = 10;
+    let foundProducts;
 
-    if (!search) {
-      const foundProducts = await this.productRepository.find({
-        take: productsPerPage,
-        skip: productsPerPage * (page - 1),
-      });
-
-      const products = foundProducts.map((product: Product) => this.convertToShowProductDTO(product));
-
-      const count = await this.productRepository.count();
-
-      const returnDTO: ProductsDTO = {
-        products,
-        count,
-      };
-
-      return returnDTO;
-
-    } else if (search) {
-      const foundProducts = await this.productRepository.find({
+    if (!foodGroup) {
+      foundProducts = await this.productRepository.find({
         where: [{
+          code: Like(`%${search}%`),
+        }, {
           description: Like(`%${search}%`),
         }],
         take: productsPerPage,
         skip: productsPerPage * (page - 1),
       });
 
-      const products = foundProducts.map((product: Product) => this.convertToShowProductDTO(product));
-
-      const count = await this.productRepository.count({
+    } else if (foodGroup) {
+      foundProducts = await this.productRepository.find({
         where: [{
+          code: Like(`%${search}%`),
+          foodGroup,
+        }, {
           description: Like(`%${search}%`),
+          foodGroup,
         }],
+        take: productsPerPage,
+        skip: productsPerPage * (page - 1),
       });
-
-      const returnDTO: ProductsDTO = {
-        products,
-        count,
-      };
-
-      return returnDTO;
     }
+
+    const products = foundProducts.map((product: Product) => this.convertToShowProductDTO(product));
+
+    const count = await this.productRepository.count();
+
+    const returnDTO: ProductsDTO = {
+      products,
+      count,
+    };
+
+    return returnDTO;
   }
 
   private convertToShowProductDTO(product: Product): ShowProductDTO {
