@@ -15,7 +15,8 @@ export class ProductsService {
 
   async findAll(page: number = 1, search: string, foodGroup: string): Promise<ProductsDTO> {
     const productsPerPage = 10;
-    let foundProducts;
+    let foundProducts: Product[];
+    let count: number;
 
     if (!foodGroup) {
       foundProducts = await this.productRepository.find({
@@ -26,6 +27,14 @@ export class ProductsService {
         }],
         take: productsPerPage,
         skip: productsPerPage * (page - 1),
+      });
+
+      count = await this.productRepository.count({
+        where: [{
+          code: Like(`%${search}%`),
+        }, {
+          description: Like(`%${search}%`),
+        }],
       });
 
     } else if (foodGroup) {
@@ -40,11 +49,19 @@ export class ProductsService {
         take: productsPerPage,
         skip: productsPerPage * (page - 1),
       });
+
+      count = await this.productRepository.count({
+        where: [{
+          code: Like(`%${search}%`),
+          foodGroup,
+        }, {
+          description: Like(`%${search}%`),
+          foodGroup,
+        }],
+      });
     }
 
     const products = foundProducts.map((product: Product) => this.convertToShowProductDTO(product));
-
-    const count = await this.productRepository.count();
 
     const returnDTO: ProductsDTO = {
       products,
