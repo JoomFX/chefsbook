@@ -6,19 +6,22 @@ import { IMeasure } from '../common/interfaces/measure';
 import { INutrition } from '../common/interfaces/nutrition';
 import { ShowProductDTO } from '../models/products/show-product.dto';
 import { ProductsDTO } from './../models/products/products.dto';
+import { FoodGroup } from '../data/entities/food-group.entity';
+import { ShowFoodGroupDTO } from '../models/products/show-food-group.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,
+    @InjectRepository(FoodGroup) private readonly foodGroupRepository: Repository<FoodGroup>,
   ) {}
 
-  async findAll(page: number = 1, search: string, foodGroup: string): Promise<ProductsDTO> {
+  async findAll(page: number = 1, search: string, foodGroup: number): Promise<ProductsDTO> {
     const productsPerPage = 10;
     let foundProducts: Product[];
     let count: number;
 
-    if (!foodGroup) {
+    if (!foodGroup || foodGroup === 0) {
       foundProducts = await this.productRepository.find({
         where: [{
           code: Like(`%${search}%`),
@@ -37,14 +40,18 @@ export class ProductsService {
         }],
       });
 
-    } else if (foodGroup) {
+    } else if (foodGroup && foodGroup !== 0) {
       foundProducts = await this.productRepository.find({
         where: [{
           code: Like(`%${search}%`),
-          foodGroup,
+          foodGroup: {
+            code: foodGroup,
+          },
         }, {
           description: Like(`%${search}%`),
-          foodGroup,
+          foodGroup: {
+            code: foodGroup,
+          },
         }],
         take: productsPerPage,
         skip: productsPerPage * (page - 1),
@@ -53,10 +60,14 @@ export class ProductsService {
       count = await this.productRepository.count({
         where: [{
           code: Like(`%${search}%`),
-          foodGroup,
+          foodGroup: {
+            code: foodGroup,
+          },
         }, {
           description: Like(`%${search}%`),
-          foodGroup,
+          foodGroup: {
+            code: foodGroup,
+          },
         }],
       });
     }
@@ -69,6 +80,11 @@ export class ProductsService {
     };
 
     return returnDTO;
+  }
+
+  async findAllFG(): Promise<ShowFoodGroupDTO[]> {
+    const foundFoodGroups: FoodGroup[] = await this.foodGroupRepository.find();
+    return foundFoodGroups;
   }
 
   private convertToShowProductDTO(product: Product): ShowProductDTO {

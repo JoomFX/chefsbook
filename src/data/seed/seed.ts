@@ -1,3 +1,4 @@
+import { Category } from './../entities/category.entity';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -6,11 +7,13 @@ import * as fd from '../USDA_db/food_des.json';
 import * as nd from '../USDA_db/nut_data.json';
 import * as ndef from '../USDA_db/nutr_def.json';
 import * as w from '../USDA_db/weight.json';
+import * as cat from '../USDA_db/categories.json';
 
 import { User } from '../entities/user.entity';
 import { Measure } from '../entities/measure.entity';
 import { Nutrition } from '../entities/nutrition.entity';
 import { Product } from '../entities/product.entity';
+import { FoodGroup } from '../entities/food-group.entity';
 
 // Custom async forEach
 async function asyncForEach(array, callback) {
@@ -26,23 +29,56 @@ const main = async () => {
   const productRepository = connection.manager.getRepository(Product);
   const measureRepository = connection.manager.getRepository(Measure);
   const nutritionRepository = connection.manager.getRepository(Nutrition);
+  const foodGroupRepository = connection.manager.getRepository(FoodGroup);
+  const categoryRepository = connection.manager.getRepository(Category);
 
   const foodGroup = fg;
   const foodDescription = fd;
   const nutrientData = nd as any;
   const nutrientDefinition = ndef;
   const weight = w;
+  const category = cat;
 
   const populateDatabase = async () => {
+    await asyncForEach(foodGroup, async (fdGrp) => {
+      const foodGrp = new FoodGroup();
+      foodGrp.code = fdGrp.FdGrp_Cd;
+      foodGrp.description = fdGrp.FdGrp_desc;
+      foodGrp.products = Promise.resolve([]);
+
+      await foodGroupRepository.save(foodGrp);
+    });
+
+    await asyncForEach(category, async (recipeCat) => {
+      const recipeCategory = new Category();
+      recipeCategory.name = recipeCat.Name;
+      recipeCategory.recipes = Promise.resolve([]);
+
+      await categoryRepository.save(recipeCategory);
+    });
+
     await asyncForEach(foodDescription, async (p) => {
       const product = await productRepository.create();
       product.code = p.NDB_No;
       product.description = p.Long_Desc;
-      const productFoodGroup = foodGroup.find((g) => g.FdGrp_Cd === p.FdGrp_Cd);
-      product.foodGroup = productFoodGroup.FdGrp_desc;
+
+      const productFoodGroup = await foodGroupRepository.findOne({
+        where: {
+          code: p.FdGrp_Cd,
+        },
+      });
+      product.foodGroup = productFoodGroup;
       await productRepository.save(product);
 
-      const measures = weight.filter((wght) => wght.NDB_No === p.NDB_No);
+      const measureInGr = new Measure();
+      measureInGr.amount = 1;
+      measureInGr.gramsPerMeasure = 1;
+      measureInGr.measure = 'g';
+      measureInGr.product = Promise.resolve(product);
+      await measureRepository.save(measureInGr);
+
+      const measures = weight.filter(wght => wght.NDB_No === p.NDB_No);
+
       await asyncForEach(measures, async (m) => {
         const measure = new Measure();
         measure.measure = m.Msre_Desc;
@@ -50,7 +86,8 @@ const main = async () => {
         if (m.Msre_Desc.includes('package') && m.Amount !== '1') {
           amount = 1;
         }
-        measure.gramsPerMeasure = amount * m.Gm_Wgt;
+        measure.amount = amount;
+        measure.gramsPerMeasure = m.Gm_Wgt;
         measure.product = Promise.resolve(product);
         await measureRepository.save(measure);
       });
@@ -58,7 +95,7 @@ const main = async () => {
       const nutrition = new Nutrition();
       nutrientDefinition.forEach((n) => {
         const code = n.Nutr_no;
-        const nutriData = nutrientData.find((nutr) => (+nutr.Nutr_No === code && +nutr.NDB_No === p.NDB_No));
+        const nutriData = nutrientData.find(nutr => (+nutr.Nutr_No === code && +nutr.NDB_No === p.NDB_No));
         let value;
         if (nutriData === undefined) {
           value = 0;

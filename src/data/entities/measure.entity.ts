@@ -12,7 +12,7 @@ export class Measure {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   /**
-   * Product that have this measure
+   * Product that has this measure
    */
   @ManyToOne(type => Product, product => product.measures)
   product: Promise<Product>;
@@ -21,6 +21,11 @@ export class Measure {
    */
   @Column()
   measure: string;
+  /**
+   * Amount for the measure
+   */
+  @Column()
+  amount: number;
   /**
    * Grams per measure
    */

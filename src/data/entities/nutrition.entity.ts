@@ -14,12 +14,12 @@ export class Nutrition {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   /**
-   * Product that have this nutrition
+   * Product that has this nutrition
    */
   @OneToOne(type => Product, product => product.nutrition, { nullable: true })
   product: Promise<Product>;
   /**
-   * Product that have this nutrition
+   * Recipe that has this nutrition
    */
   @OneToOne(type => Recipe, recipe => recipe.nutrition, { nullable: true })
   recipe: Promise<Recipe>;
@@ -133,4 +133,9 @@ export class Nutrition {
    */
   @Column('simple-json')
   FAPU: INutrient;
+  /**
+   * Is the nutrition deleted
+   */
+  @Column({ default: false })
+  isDeleted: boolean;
 }
