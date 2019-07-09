@@ -5,10 +5,10 @@ import { Category } from './../data/entities/category.entity';
 import { Recipe } from './../data/entities/recipe.entity';
 import { RecipesController } from './recipes.controller';
 import { RecipesService } from './recipes.service';
-
+import { Ingredient } from './../data/entities/ingredient.entity';
 
 @Module({
-  imports: [AuthModule, TypeOrmModule.forFeature([Recipe, Category])],
+  imports: [AuthModule, TypeOrmModule.forFeature([Recipe, Category, Ingredient])],
   controllers: [RecipesController],
   providers: [RecipesService],
 })
