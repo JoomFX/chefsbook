@@ -1,5 +1,5 @@
 export interface INutrient {
-  desciption: string;
+  description: string;
   unit: string;
   value: number;
 }

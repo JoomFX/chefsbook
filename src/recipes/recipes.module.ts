@@ -6,9 +6,10 @@ import { Recipe } from './../data/entities/recipe.entity';
 import { RecipesController } from './recipes.controller';
 import { RecipesService } from './recipes.service';
 import { Ingredient } from './../data/entities/ingredient.entity';
+import { Nutrition } from './../data/entities/nutrition.entity';
 
 @Module({
-  imports: [AuthModule, TypeOrmModule.forFeature([Recipe, Category, Ingredient])],
+  imports: [AuthModule, TypeOrmModule.forFeature([Recipe, Category, Ingredient, Nutrition])],
   controllers: [RecipesController],
   providers: [RecipesService],
 })
