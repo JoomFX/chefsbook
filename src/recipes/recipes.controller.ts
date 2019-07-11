@@ -1,8 +1,9 @@
-import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecipesService } from './recipes.service';
 import { ShowCategoryDTO } from '../models/recipes/show-category.dto';
 import { CreateRecipeDTO } from '../models/recipes/create-recipe.dto';
+import { RecipesDTO } from '../models/recipes/recipes.dto';
 import { ShowRecipeDTO } from '../models/recipes/show-recipe.dto';
 
 @UseGuards(AuthGuard())
@@ -11,6 +12,15 @@ export class RecipesController {
   constructor(
     private readonly recipeService: RecipesService,
   ) {}
+
+  @Get()
+  async findAll(
+    @Query('page') page,
+    @Query('search') search,
+    @Query('category') category,
+  ): Promise<RecipesDTO> {
+    return await this.recipeService.findAll(page, search, category);
+  }
 
   @Post()
   async create(

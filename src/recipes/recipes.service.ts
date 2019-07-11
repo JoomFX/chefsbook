@@ -1,6 +1,6 @@
 import { INutrient } from './../common/interfaces/nutrient';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Like, CreateDateColumn } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './../data/entities/category.entity';
 import { Recipe } from './../data/entities/recipe.entity';
@@ -10,6 +10,7 @@ import { CreateRecipeDTO } from 'src/models/recipes/create-recipe.dto';
 import { ShowRecipeDTO } from 'src/models/recipes/show-recipe.dto';
 import { Ingredient } from './../data/entities/ingredient.entity';
 import { Nutrition } from './../data/entities/nutrition.entity';
+import { RecipesDTO } from '../models/recipes/recipes.dto';
 
 @Injectable()
 export class RecipesService {
@@ -19,6 +20,78 @@ export class RecipesService {
     @InjectRepository(Nutrition) private readonly nutritionRepository: Repository<Nutrition>,
     @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
   ) {}
+
+  async findAll(page: number = 1, search: string, category: string): Promise<RecipesDTO> {
+    const recipesPerPage = 10;
+    let foundRecipes: Recipe[];
+    let count: number;
+
+    if (!category) {
+      foundRecipes = await this.recipeRepository.find({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+        }],
+        order: {
+          created: 'DESC',
+        },
+        take: recipesPerPage,
+        skip: recipesPerPage * (page - 1),
+      });
+
+      count = await this.recipeRepository.count({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+        }],
+      });
+
+    } else if (category) {
+      foundRecipes = await this.recipeRepository.find({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          category,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          category,
+        }],
+        order: {
+          created: 'DESC',
+        },
+        take: recipesPerPage,
+        skip: recipesPerPage * (page - 1),
+      });
+
+      count = await this.recipeRepository.count({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          category,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          category,
+        }],
+      });
+    }
+
+    const recipes = await Promise.all(foundRecipes.map((recipe: Recipe) => this.convertToShowRecipeDTO(recipe)));
+
+    const returnDTO: RecipesDTO = {
+      recipes,
+      count,
+    };
+
+    return returnDTO;
+  }
 
   async create(recipe: CreateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
 
