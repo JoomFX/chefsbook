@@ -22,6 +22,11 @@ export class RecipesController {
     return await this.recipeService.findAll(page, search, category);
   }
 
+  @Get('categories')
+  async findAllCategories(): Promise<ShowCategoryDTO[]> {
+    return await this.recipeService.findAllCategories();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ShowRecipeDTO> {
     return await this.recipeService.findOne(id);
@@ -33,10 +38,5 @@ export class RecipesController {
     @Req() request,
     ): Promise<ShowRecipeDTO> {
     return await this.recipeService.create(recipe, request.user);
-  }
-
-  @Get('categories')
-  async findAllCategories(): Promise<ShowCategoryDTO[]> {
-    return await this.recipeService.findAllCategories();
   }
 }
