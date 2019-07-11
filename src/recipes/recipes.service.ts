@@ -1,5 +1,5 @@
 import { INutrient } from './../common/interfaces/nutrient';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Repository, Like, CreateDateColumn } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './../data/entities/category.entity';
@@ -91,6 +91,23 @@ export class RecipesService {
     };
 
     return returnDTO;
+  }
+
+  async findOne(id: string): Promise<ShowRecipeDTO> {
+    const foundRecipe = await this.recipeRepository.findOne({
+      where: {
+        id,
+        isDeleted: false,
+      },
+    });
+
+    if (!foundRecipe) {
+      throw new BadRequestException('Recipe with this ID does not exist.');
+    }
+
+    const convertedRecipe = await this.convertToShowRecipeDTO(foundRecipe);
+
+    return convertedRecipe;
   }
 
   async create(recipe: CreateRecipeDTO, user: User): Promise<ShowRecipeDTO> {

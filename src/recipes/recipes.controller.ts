@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecipesService } from './recipes.service';
 import { ShowCategoryDTO } from '../models/recipes/show-category.dto';
@@ -20,6 +20,11 @@ export class RecipesController {
     @Query('category') category,
   ): Promise<RecipesDTO> {
     return await this.recipeService.findAll(page, search, category);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<ShowRecipeDTO> {
+    return await this.recipeService.findOne(id);
   }
 
   @Post()
