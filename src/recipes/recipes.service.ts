@@ -1,6 +1,5 @@
-import { INutrient } from './../common/interfaces/nutrient';
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Repository, Like, CreateDateColumn } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './../data/entities/category.entity';
 import { Recipe } from './../data/entities/recipe.entity';
@@ -11,12 +10,15 @@ import { ShowRecipeDTO } from 'src/models/recipes/show-recipe.dto';
 import { Ingredient } from './../data/entities/ingredient.entity';
 import { Nutrition } from './../data/entities/nutrition.entity';
 import { RecipesDTO } from '../models/recipes/recipes.dto';
+import { INutrition } from '../common/interfaces/nutrition';
+import { Subrecipe } from './../data/entities/subrecipe.entity';
 
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectRepository(Recipe) private readonly recipeRepository: Repository<Recipe>,
     @InjectRepository(Ingredient) private readonly ingredientRepository: Repository<Ingredient>,
+    @InjectRepository(Subrecipe) private readonly subrecipeRepository: Repository<Subrecipe>,
     @InjectRepository(Nutrition) private readonly nutritionRepository: Repository<Nutrition>,
     @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
   ) {}
@@ -111,10 +113,12 @@ export class RecipesService {
   }
 
   async create(recipe: CreateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
+    console.log(recipe);
 
     const newRecipe: Recipe = await this.recipeRepository.create(recipe);
     newRecipe.author = Promise.resolve(user);
 
+    // Holds the nutrition of both Ingredients and Subrecipes
     const ingredientNutrition: Nutrition[] = [];
 
     // Calculate Ingredient Nutrition
@@ -132,6 +136,22 @@ export class RecipesService {
       for (const key in nutrition) {
         if (nutrition.hasOwnProperty(key)) {
           nutrition[key].value = Number((nutrition[key].value * coefficient).toFixed(2));
+        }
+      }
+
+      ingredientNutrition.push(nutrition);
+    });
+
+    // Calculate Subrecipe Nutrition
+    recipe.recipes.map(async (item: any) => {
+      const quantity = item.amount;
+
+      let nutrition: Nutrition = await this.nutritionRepository.create();
+      nutrition = item.recipe.nutrition;
+
+      for (const key in nutrition) {
+        if (nutrition.hasOwnProperty(key)) {
+          nutrition[key].value = Number((nutrition[key].value * quantity).toFixed(2));
         }
       }
 
@@ -273,6 +293,17 @@ export class RecipesService {
       return savedIngredient;
     }));
 
+    newRecipe.subrecipes = await Promise.all(recipe.recipes.map(async (item: any) => {
+      const newSubrecipe: Subrecipe = this.subrecipeRepository.create();
+
+      newSubrecipe.recipe = item.recipe;
+      newSubrecipe.quantity = item.amount;
+
+      const savedSubrecipe = await this.subrecipeRepository.save(newSubrecipe);
+
+      return savedSubrecipe;
+    }));
+
     newRecipe.nutrition = totalRecipeNutrition;
 
     const savedRecipe = await this.recipeRepository.save(newRecipe);
@@ -286,6 +317,31 @@ export class RecipesService {
   }
 
   private async convertToShowRecipeDTO(recipe: Recipe): Promise<ShowRecipeDTO> {
+    const nutrition: INutrition = {
+      PROCNT: recipe.nutrition.PROCNT,
+      FAT: recipe.nutrition.FAT,
+      CHOCDF: recipe.nutrition.CHOCDF,
+      ENERC_KCAL: recipe.nutrition.ENERC_KCAL,
+      SUGAR: recipe.nutrition.SUGAR,
+      FIBTG: recipe.nutrition.FIBTG,
+      CA: recipe.nutrition.CA,
+      FE: recipe.nutrition.FE,
+      P: recipe.nutrition.P,
+      K: recipe.nutrition.K,
+      NA: recipe.nutrition.NA,
+      VITA_IU: recipe.nutrition.VITA_IU,
+      TOCPHA: recipe.nutrition.TOCPHA,
+      VITD: recipe.nutrition.VITD,
+      VITC: recipe.nutrition.VITC,
+      VITB12: recipe.nutrition.VITB12,
+      FOLAC: recipe.nutrition.FOLAC,
+      CHOLE: recipe.nutrition.CHOLE,
+      FATRN: recipe.nutrition.FATRN,
+      FASAT: recipe.nutrition.FASAT,
+      FAMS: recipe.nutrition.FAMS,
+      FAPU: recipe.nutrition.FAPU,
+    };
+
     const covertedRecipe: ShowRecipeDTO = {
       id: recipe.id,
       title: recipe.title,
@@ -293,7 +349,7 @@ export class RecipesService {
       category: recipe.category,
       products: recipe.ingredients,
       subrecipes: recipe.subrecipes,
-      nutrition: recipe.nutrition,
+      nutrition,
       user: (await recipe.author).username,
       userID: (await recipe.author).id,
       created: recipe.created,

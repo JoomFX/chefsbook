@@ -1,8 +1,8 @@
 import { Nutrition } from './../../data/entities/nutrition.entity';
-import { Recipe } from './../../data/entities/recipe.entity';
 import { Ingredient } from './../../data/entities/ingredient.entity';
 import { Category } from './../../data/entities/category.entity';
 import { IsString, Length } from 'class-validator';
+import { Subrecipe } from '../../data/entities/subrecipe.entity';
 
 export class CreateRecipeDTO {
   @IsString()
@@ -15,6 +15,6 @@ export class CreateRecipeDTO {
 
   category: Category;
   products: Ingredient[];
-  recipes: Recipe[];
+  recipes: Subrecipe[];
   nutrition: Nutrition;
 }

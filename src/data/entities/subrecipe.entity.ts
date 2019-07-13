@@ -5,13 +5,18 @@ import { Recipe } from './recipe.entity';
 /**
  * Subrecipe entity
  */
-@Entity('subrecipe')
+@Entity('subrecipes')
 export class Subrecipe {
   /**
    * Id of the subrecipe
    */
   @PrimaryGeneratedColumn('uuid')
   id: string;
+  /**
+   * Quantity of the subrecipe
+   */
+  @Column({ default: 0 })
+  quantity: number;
   /**
    * Is the subrecipe deleted
    */

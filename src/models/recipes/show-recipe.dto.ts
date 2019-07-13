@@ -1,7 +1,7 @@
 import { Category } from './../../data/entities/category.entity';
 import { Ingredient } from '../../data/entities/ingredient.entity';
 import { Subrecipe } from '../../data/entities/subrecipe.entity';
-import { Nutrition } from '../../data/entities/nutrition.entity';
+import { INutrition } from '../../common/interfaces/nutrition';
 
 export class ShowRecipeDTO {
   id: string;
@@ -10,7 +10,7 @@ export class ShowRecipeDTO {
   category: Category;
   products: Ingredient[];
   subrecipes: Subrecipe[];
-  nutrition: Nutrition;
+  nutrition: INutrition;
   user: string;
   userID: string;
   created: Date;
