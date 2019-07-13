@@ -57,6 +57,11 @@ export class Recipe {
   @OneToMany(type => Subrecipe, subrecipe => subrecipe.recipe, { eager: true })
   subrecipes: Subrecipe[];
   /**
+   * Does the recipe have subrecipes
+   */
+  @Column({ default: false })
+  hasSubrecipes: boolean;
+  /**
    * Nutrient data for the recipe
    */
   @OneToOne(type => Nutrition, nutrition => nutrition.recipe, { eager: true, onDelete: 'CASCADE', cascade: true  })

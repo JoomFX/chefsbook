@@ -23,12 +23,12 @@ export class RecipesService {
     @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  async findAll(page: number = 1, search: string, category: string): Promise<RecipesDTO> {
+  async findAll(page: number = 1, search: string, category: string, filtered: string): Promise<RecipesDTO> {
     const recipesPerPage = 10;
     let foundRecipes: Recipe[];
     let count: number;
 
-    if (!category) {
+    if (!category && !filtered) {
       foundRecipes = await this.recipeRepository.find({
         where: [{
           isDeleted: false,
@@ -54,7 +54,7 @@ export class RecipesService {
         }],
       });
 
-    } else if (category) {
+    } else if (category && !filtered) {
       foundRecipes = await this.recipeRepository.find({
         where: [{
           isDeleted: false,
@@ -81,6 +81,69 @@ export class RecipesService {
           isDeleted: false,
           description: Like(`%${search}%`),
           category,
+        }],
+      });
+    } else if (!category && filtered) {
+      foundRecipes = await this.recipeRepository.find({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          hasSubrecipes: false,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          hasSubrecipes: false,
+        }],
+        order: {
+          created: 'DESC',
+        },
+        take: recipesPerPage,
+        skip: recipesPerPage * (page - 1),
+      });
+
+      count = await this.recipeRepository.count({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          hasSubrecipes: false,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          hasSubrecipes: false,
+        }],
+      });
+
+    } else if (category && filtered) {
+      foundRecipes = await this.recipeRepository.find({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          category,
+          hasSubrecipes: false,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          category,
+          hasSubrecipes: false,
+        }],
+        order: {
+          created: 'DESC',
+        },
+        take: recipesPerPage,
+        skip: recipesPerPage * (page - 1),
+      });
+
+      count = await this.recipeRepository.count({
+        where: [{
+          isDeleted: false,
+          title: Like(`%${search}%`),
+          category,
+          hasSubrecipes: false,
+        }, {
+          isDeleted: false,
+          description: Like(`%${search}%`),
+          category,
+          hasSubrecipes: false,
         }],
       });
     }
@@ -113,10 +176,9 @@ export class RecipesService {
   }
 
   async create(recipe: CreateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
-    console.log(recipe);
-
     const newRecipe: Recipe = await this.recipeRepository.create(recipe);
     newRecipe.author = Promise.resolve(user);
+    newRecipe.hasSubrecipes = recipe.recipes.length > 0 ? true : false;
 
     // Holds the nutrition of both Ingredients and Subrecipes
     const ingredientNutrition: Nutrition[] = [];
