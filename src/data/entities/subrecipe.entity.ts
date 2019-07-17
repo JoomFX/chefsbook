@@ -13,6 +13,11 @@ export class Subrecipe {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   /**
+   * Recipe
+   */
+  @ManyToOne(type => Recipe, recipe => recipe.derivedRecipes)
+  linkedRecipe: Promise<Recipe>;
+  /**
    * Quantity of the subrecipe
    */
   @Column({ default: 0 })

@@ -57,6 +57,11 @@ export class Recipe {
   @OneToMany(type => Subrecipe, subrecipe => subrecipe.recipe, { eager: true })
   subrecipes: Subrecipe[];
   /**
+   * Derived recipes from the recipe
+   */
+  @OneToMany(type => Subrecipe, subrecipe => subrecipe.linkedRecipe)
+  derivedRecipes: Promise<Subrecipe[]>;
+  /**
    * Does the recipe have subrecipes
    */
   @Column({ default: false })
