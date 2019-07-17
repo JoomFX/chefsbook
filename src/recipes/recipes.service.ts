@@ -380,7 +380,9 @@ export class RecipesService {
 
   private async convertToShowRecipeDTO(recipe: Recipe): Promise<ShowRecipeDTO> {
     // NEED TO FINISH THIS SUBRECIPE STUFF !!!
-    const subrecipes = recipe.subrecipes.map(async (subrecipe) => {
+    const subrecipes = [];
+
+    recipe.subrecipes.map(async (subrecipe) => {
       const item = await this.subrecipeRepository.find({
         relations: ['linkedRecipe'],
         where: {
@@ -389,13 +391,18 @@ export class RecipesService {
         },
       });
 
-      console.log(item[0].linkedRecipe);
+      const recipeReal: Recipe = await item[0].linkedRecipe;
+      const quantity = item[0].quantity;
 
       const subrecipeToReturn = {
-        recipes: null,
-        quantity: null,
-      }
+        recipeReal,
+        quantity,
+      };
+
+      subrecipes.push(subrecipeToReturn);
     });
+
+    // console.log(subrecipes);
 
     const nutrition: INutrition = {
       PROCNT: recipe.nutrition.PROCNT,
@@ -428,7 +435,7 @@ export class RecipesService {
       description: recipe.description,
       category: recipe.category,
       products: recipe.ingredients,
-      subrecipes: recipe.subrecipes,
+      subrecipes: await subrecipes,
       nutrition,
       user: (await recipe.author).username,
       userID: (await recipe.author).id,
