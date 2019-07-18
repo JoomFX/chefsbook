@@ -355,6 +355,8 @@ export class RecipesService {
       return savedIngredient;
     }));
 
+    // console.log(recipe.recipes);
+
     newRecipe.subrecipes = await Promise.all(recipe.recipes.map(async (item: any) => {
       const newSubrecipe: Subrecipe = this.subrecipeRepository.create();
 
@@ -379,10 +381,8 @@ export class RecipesService {
   }
 
   private async convertToShowRecipeDTO(recipe: Recipe): Promise<ShowRecipeDTO> {
-    // NEED TO FINISH THIS SUBRECIPE STUFF !!!
-    const subrecipes = [];
 
-    recipe.subrecipes.map(async (subrecipe) => {
+    const subrecipes = await Promise.all(recipe.subrecipes.map(async (subrecipe) => {
       const item = await this.subrecipeRepository.find({
         relations: ['linkedRecipe'],
         where: {
@@ -394,15 +394,15 @@ export class RecipesService {
       const recipeReal: Recipe = await item[0].linkedRecipe;
       const quantity = item[0].quantity;
 
+      const newRecipe = await this.convertToShowRecipeDTO(recipeReal);
+
       const subrecipeToReturn = {
-        recipeReal,
+        recipe: newRecipe,
         quantity,
       };
 
-      subrecipes.push(subrecipeToReturn);
-    });
-
-    // console.log(subrecipes);
+      return subrecipeToReturn;
+    }));
 
     const nutrition: INutrition = {
       PROCNT: recipe.nutrition.PROCNT,
@@ -435,7 +435,7 @@ export class RecipesService {
       description: recipe.description,
       category: recipe.category,
       products: recipe.ingredients,
-      subrecipes: await subrecipes,
+      subrecipes,
       nutrition,
       user: (await recipe.author).username,
       userID: (await recipe.author).id,
