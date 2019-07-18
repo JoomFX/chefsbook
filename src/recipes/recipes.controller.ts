@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query, Param } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query, Param, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecipesService } from './recipes.service';
 import { ShowCategoryDTO } from '../models/recipes/show-category.dto';
@@ -39,5 +39,15 @@ export class RecipesController {
     @Req() request,
     ): Promise<ShowRecipeDTO> {
     return await this.recipeService.create(recipe, request.user);
+  }
+
+
+
+  @Delete(':id')
+  async delete(
+    @Param('id') id: string,
+    @Req() request,
+    ): Promise<ShowRecipeDTO> {
+    return await this.recipeService.delete(id, request.user);
   }
 }

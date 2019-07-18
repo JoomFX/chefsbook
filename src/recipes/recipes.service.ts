@@ -380,6 +380,30 @@ export class RecipesService {
     return foundCategories;
   }
 
+  async delete(id: string, user: User): Promise<ShowRecipeDTO> {
+    const recipeToDelete = await this.recipeRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!recipeToDelete) {
+      throw new BadRequestException('Recipe with this ID does not exist.');
+    }
+
+    const recipeAuthor = await recipeToDelete.author;
+
+    if (recipeAuthor.id === user.id) {
+      recipeToDelete.isDeleted = true;
+    } else {
+      throw new BadRequestException('Only the post owner can delete it.');
+    }
+
+    const deletedPost = await this.recipeRepository.save(recipeToDelete);
+
+    return this.convertToShowRecipeDTO(deletedPost);
+  }
+
   private async convertToShowRecipeDTO(recipe: Recipe): Promise<ShowRecipeDTO> {
 
     const subrecipes = await Promise.all(recipe.subrecipes.map(async (subrecipe) => {
