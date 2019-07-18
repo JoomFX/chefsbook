@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './../data/entities/category.entity';
 import { Recipe } from './../data/entities/recipe.entity';
 import { ShowCategoryDTO } from '../models/recipes/show-category.dto';
-import { User } from 'src/data/entities/user.entity';
-import { CreateRecipeDTO } from 'src/models/recipes/create-recipe.dto';
-import { ShowRecipeDTO } from 'src/models/recipes/show-recipe.dto';
+import { User } from '../data/entities/user.entity';
+import { CreateUpdateRecipeDTO } from 'src/models/recipes/create-update-recipe.dto';
+import { ShowRecipeDTO } from '../models/recipes/show-recipe.dto';
 import { Ingredient } from './../data/entities/ingredient.entity';
 import { Nutrition } from './../data/entities/nutrition.entity';
 import { RecipesDTO } from '../models/recipes/recipes.dto';
@@ -175,7 +175,7 @@ export class RecipesService {
     return convertedRecipe;
   }
 
-  async create(recipe: CreateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
+  async create(recipe: CreateUpdateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
     const newRecipe: Recipe = await this.recipeRepository.create(recipe);
     newRecipe.author = Promise.resolve(user);
     newRecipe.hasSubrecipes = recipe.recipes.length > 0 ? true : false;
@@ -343,30 +343,8 @@ export class RecipesService {
     totalRecipeNutrition.FAMS = { description: 'Fatty acids, total monounsaturated', unit: 'g', value: totalFAMS };
     totalRecipeNutrition.FAPU = { description: 'Fatty acids, total polyunsaturated', unit: 'g', value: totalFAPU };
 
-    newRecipe.ingredients = await Promise.all(recipe.products.map(async (item: any) => {
-      const newIngredient: Ingredient = this.ingredientRepository.create();
-
-      newIngredient.product = item.product;
-      newIngredient.quantity = item.amount;
-      newIngredient.unit = item.measure;
-
-      const savedIngredient = await this.ingredientRepository.save(newIngredient);
-
-      return savedIngredient;
-    }));
-
-    // console.log(recipe.recipes);
-
-    newRecipe.subrecipes = await Promise.all(recipe.recipes.map(async (item: any) => {
-      const newSubrecipe: Subrecipe = this.subrecipeRepository.create();
-
-      newSubrecipe.linkedRecipe = item.recipe;
-      newSubrecipe.quantity = item.amount;
-
-      const savedSubrecipe = await this.subrecipeRepository.save(newSubrecipe);
-
-      return savedSubrecipe;
-    }));
+    newRecipe.ingredients = await this.prepareRecipeIngredients(recipe);
+    newRecipe.subrecipes = await this.prepareRecipeSubrecipes(recipe);
 
     newRecipe.nutrition = totalRecipeNutrition;
 
@@ -378,6 +356,38 @@ export class RecipesService {
   async findAllCategories(): Promise<ShowCategoryDTO[]> {
     const foundCategories: Category[] = await this.categoryRepository.find();
     return foundCategories;
+  }
+
+  async update(id: string, recipe: CreateUpdateRecipeDTO, user: User): Promise<ShowRecipeDTO> {
+    const recipeToUpdate = await this.recipeRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!recipeToUpdate) {
+      throw new BadRequestException('Recipe with this ID does not exist.');
+    }
+
+    const recipeAuthor = await recipeToUpdate.author;
+
+    if (recipeAuthor.id === user.id) {
+      recipeToUpdate.title = recipe.title;
+      recipeToUpdate.description = recipe.description;
+      recipeToUpdate.hasSubrecipes = recipe.recipes.length > 0 ? true : false;
+      recipeToUpdate.category = recipe.category;
+
+      recipeToUpdate.ingredients = await this.prepareRecipeIngredients(recipe);
+      recipeToUpdate.subrecipes = await this.prepareRecipeSubrecipes(recipe);
+
+      recipeToUpdate.nutrition = recipe.nutrition;
+    } else {
+      throw new BadRequestException('Only the recipe owner can update it.');
+    }
+
+    const updatedRecipe = await this.recipeRepository.save(recipeToUpdate);
+
+    return this.convertToShowRecipeDTO(updatedRecipe);
   }
 
   async delete(id: string, user: User): Promise<ShowRecipeDTO> {
@@ -399,9 +409,9 @@ export class RecipesService {
       throw new BadRequestException('Only the post owner can delete it.');
     }
 
-    const deletedPost = await this.recipeRepository.save(recipeToDelete);
+    const deletedRecipe = await this.recipeRepository.save(recipeToDelete);
 
-    return this.convertToShowRecipeDTO(deletedPost);
+    return this.convertToShowRecipeDTO(deletedRecipe);
   }
 
   private async convertToShowRecipeDTO(recipe: Recipe): Promise<ShowRecipeDTO> {
@@ -468,4 +478,36 @@ export class RecipesService {
 
     return covertedRecipe;
   }
+
+  private async prepareRecipeIngredients(recipe: CreateUpdateRecipeDTO): Promise<Ingredient[]> {
+    const ingredients = await Promise.all(recipe.products.map(async (item: any) => {
+      const newIngredient: Ingredient = this.ingredientRepository.create();
+
+      newIngredient.product = item.product;
+      newIngredient.quantity = item.amount;
+      newIngredient.unit = item.measure;
+
+      const savedIngredient = await this.ingredientRepository.save(newIngredient);
+
+      return savedIngredient;
+    }));
+
+    return ingredients;
+  }
+
+  private async prepareRecipeSubrecipes(recipe: CreateUpdateRecipeDTO): Promise<Subrecipe[]> {
+    const subrecipes = await Promise.all(recipe.recipes.map(async (item: any) => {
+      const newSubrecipe: Subrecipe = this.subrecipeRepository.create();
+
+      newSubrecipe.linkedRecipe = item.recipe;
+      newSubrecipe.quantity = item.amount;
+
+      const savedSubrecipe = await this.subrecipeRepository.save(newSubrecipe);
+
+      return savedSubrecipe;
+    }));
+
+    return subrecipes;
+  }
+
 }

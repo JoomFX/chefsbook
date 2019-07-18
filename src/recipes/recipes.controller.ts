@@ -1,8 +1,8 @@
-import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, ValidationPipe, Req, Query, Param, Delete, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecipesService } from './recipes.service';
 import { ShowCategoryDTO } from '../models/recipes/show-category.dto';
-import { CreateRecipeDTO } from '../models/recipes/create-recipe.dto';
+import { CreateUpdateRecipeDTO } from '../models/recipes/create-update-recipe.dto';
 import { RecipesDTO } from '../models/recipes/recipes.dto';
 import { ShowRecipeDTO } from '../models/recipes/show-recipe.dto';
 
@@ -35,13 +35,20 @@ export class RecipesController {
 
   @Post()
   async create(
-    @Body(new ValidationPipe()) recipe: CreateRecipeDTO,
+    @Body() recipe: CreateUpdateRecipeDTO,
     @Req() request,
     ): Promise<ShowRecipeDTO> {
     return await this.recipeService.create(recipe, request.user);
   }
 
-
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() recipe: CreateUpdateRecipeDTO,
+    @Req() request,
+    ): Promise<ShowRecipeDTO> {
+    return await this.recipeService.update(id, recipe, request.user);
+  }
 
   @Delete(':id')
   async delete(
