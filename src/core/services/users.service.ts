@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,6 +24,23 @@ export class UsersService {
     const savedUser = await this.usersRepository.save(newUser);
 
     return this.convertToShowUserDTO(savedUser);
+  }
+
+  async findUserById(id: string): Promise<ShowUserDTO> {
+    const foundUser = await this.usersRepository.findOne({
+      where: {
+        id,
+        isDeleted: false,
+      },
+    });
+
+    if (!foundUser) {
+      throw new BadRequestException('User with this ID does not exist.');
+    }
+
+    const convertedUser = await this.convertToShowUserDTO(foundUser);
+
+    return convertedUser;
   }
 
   async findUserByEmail(email: string): Promise<ShowUserDTO> | undefined {
