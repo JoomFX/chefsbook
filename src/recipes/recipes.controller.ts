@@ -19,8 +19,9 @@ export class RecipesController {
     @Query('search') search,
     @Query('category') category,
     @Query('filtered') filtered,
+    @Req() request,
   ): Promise<RecipesDTO> {
-    return await this.recipeService.findAll(page, search, category, filtered);
+    return await this.recipeService.findAll(page, search, category, filtered, request.user);
   }
 
   @Get('categories')

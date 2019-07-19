@@ -23,7 +23,7 @@ export class RecipesService {
     @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  async findAll(page: number = 1, search: string, category: string, filtered: string): Promise<RecipesDTO> {
+  async findAll(page: number = 1, search: string, category: string, filtered: string, user: User): Promise<RecipesDTO> {
     const recipesPerPage = 10;
     let foundRecipes: Recipe[];
     let count: number;
@@ -33,9 +33,11 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
         }],
         order: {
           created: 'DESC',
@@ -48,9 +50,11 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
         }],
       });
 
@@ -59,10 +63,12 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           category,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           category,
         }],
         order: {
@@ -76,10 +82,12 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           category,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           category,
         }],
       });
@@ -88,10 +96,12 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           hasSubrecipes: false,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           hasSubrecipes: false,
         }],
         order: {
@@ -105,10 +115,12 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           hasSubrecipes: false,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           hasSubrecipes: false,
         }],
       });
@@ -118,11 +130,13 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           category,
           hasSubrecipes: false,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           category,
           hasSubrecipes: false,
         }],
@@ -137,11 +151,13 @@ export class RecipesService {
         where: [{
           isDeleted: false,
           title: Like(`%${search}%`),
+          author: user,
           category,
           hasSubrecipes: false,
         }, {
           isDeleted: false,
           description: Like(`%${search}%`),
+          author: user,
           category,
           hasSubrecipes: false,
         }],
