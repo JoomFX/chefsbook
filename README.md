@@ -15,16 +15,17 @@ Final Project Assignment for Telerik Academy Aplpha with JavaScript - Design and
 
 ### User Stories - Project Timeline
 
-- x Authenticate users - Register, Login, Logout
-- x Users can CRUD recipes
-- x Users can serach list of recipes by name or filter by category or by choosen nutrition value between given boundaries
-- x Users can serach for product and filter by product group
+- Authenticate users - Register, Login, Logout
+- Users can CRUD recipes
+- Users can search list of recipes by name or filter by category
+- Users can search for product and filter by product group
 
 
 ### Stack
 
-- Database - MariaDB and Redis
-- REST API - NestJS
+- MariaDB/MySQL
+- TypeORM
+- NestJS
 
 ----------
 
@@ -34,11 +35,11 @@ Final Project Assignment for Telerik Academy Aplpha with JavaScript - Design and
 
 Clone the repository
 
-    git clone https://gitlab.com/recipe-nutrition-calculator/api.git
+    git clone https://github.com/JoomFX/chefsbook-backend.git
 
 Switch to the repo folder
 
-    cd api
+    cd chefsbook-backend
     
 Install dependencies
     
@@ -48,21 +49,18 @@ Install dependencies
 
 ## Database
 
-### MariaDB
+### MariaDB/MySQL
 
 The example codebase uses [Typeorm](http://typeorm.io/) with a MariaDB database.
 
-Create a new MariaDB database with the name `recipes_db` (or the name you specified in the ormconfig.json)
+Create a new MariaDB database with the name `recipes_db` (or the name you specified in the ormconfig.json).
 
-MariaDb database settings are in ormconfig.json
+MariaDb database settings are in `ormconfig.json`.
 
-Start local MariaDB server and create new database 'recipes_db'
+Start local MariaDB server and create new database 'recipes_db'.
 
-### Redis
+You will need a `.env` file as. You can modify the one included in the project.
 
-Start local Redis server
-
-----------
 
 ## NPM scripts
 
@@ -70,7 +68,6 @@ Start local Redis server
 - `npm run start:dev` - Start application in nodemon
 - `npm run typeorm` - run Typeorm commands
 - `npm run seed` - initial seed for the database
-- `npm run test` - run Jest test runner 
-- `npm run compodoc` - run Compodoc to see full documentation of the app 
+- `npm run test` - run Jest test runner
 
 ----------
