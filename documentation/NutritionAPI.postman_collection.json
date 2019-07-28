@@ -1,0 +1,454 @@
+{
+	"info": {
+		"_postman_id": "aa2738c2-e2ec-486f-8ce8-71dca7525013",
+		"name": "NutritionAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "User Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"peter\",\n\t\"email\": \"peter@peter.com\",\n\t\"password\": \"Peter123456!\",\n\t\"firstName\": \"Peter\",\n\t\"lastName\": \"Anderson\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"peter@peter.com\",\n\t\"password\": \"Peter123456!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/session",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"session"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyQHBldGVyLmNvbSIsImlhdCI6MTU2NDMxMzMyOSwiZXhwIjoxNTY0OTE4MTI5fQ.OdPAhh0QI-47Xcfjz36q3H-aGs2OzAFzmLS7FrJ2uu0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/auth/session",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"session"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Iml2b0Bpdm8uY29tIiwiaWF0IjoxNTY0MzExMjMwLCJleHAiOjE1NjQ5MTYwMzB9.x9TZ2t4nK02BrjBpzkgkEZK677vUFk26nhyunV3onxo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/products?page=1&search=&foodGroup=",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "foodGroup",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get FoodGroups",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Iml2b0Bpdm8uY29tIiwiaWF0IjoxNTY0MzExMjMwLCJleHAiOjE1NjQ5MTYwMzB9.x9TZ2t4nK02BrjBpzkgkEZK677vUFk26nhyunV3onxo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/products/foodgroups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"products",
+								"foodgroups"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recipes",
+			"item": [
+				{
+					"name": "Get Recipes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/recipes?page=1&search=&category=&filtered",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "category",
+									"value": ""
+								},
+								{
+									"key": "filtered",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/recipes/categories",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Recipe (by ID)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/recipes/c0088150-f920-40a8-b86f-7c36d1a5694c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes",
+								"c0088150-f920-40a8-b86f-7c36d1a5694c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Recipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"New Recipe\",\n\t\"description\": \"Recipe Description\",\n\t\"category\": \"Soups\",\n\t\"products\": [],\n\t\"recipes\": [],\n\t\"nutrition\": null\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/recipes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Recipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Updated Recipe\",\n\t\"description\": \"Recipe Description\",\n\t\"category\": \"Soups\",\n\t\"products\": [],\n\t\"recipes\": [],\n    \"nutrition\": {\n        \"PROCNT\": {\n            \"description\": \"Protein\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"FAT\": {\n            \"description\": \"Total lipid (fat)\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"CHOCDF\": {\n            \"description\": \"Carbohydrate, by difference\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"ENERC_KCAL\": {\n            \"description\": \"Energy\",\n            \"unit\": \"kcal\",\n            \"value\": 0\n        },\n        \"SUGAR\": {\n            \"description\": \"Sugars, total\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"FIBTG\": {\n            \"description\": \"Fiber, total dietary\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"CA\": {\n            \"description\": \"Calcium, Ca\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"FE\": {\n            \"description\": \"Iron, Fe\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"P\": {\n            \"description\": \"Phosphorus, P\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"K\": {\n            \"description\": \"Potassium, K\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"NA\": {\n            \"description\": \"Sodium, Na\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"VITA_IU\": {\n            \"description\": \"Vitamin A, IU\",\n            \"unit\": \"IU\",\n            \"value\": 0\n        },\n        \"TOCPHA\": {\n            \"description\": \"Vitamin E (alpha-tocopherol)\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"VITD\": {\n            \"description\": \"Vitamin D\",\n            \"unit\": \"IU\",\n            \"value\": 0\n        },\n        \"VITC\": {\n            \"description\": \"Vitamin C, total ascorbic acid\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"VITB12\": {\n            \"description\": \"Vitamin B-12\",\n            \"unit\": \"µg\",\n            \"value\": 0\n        },\n        \"FOLAC\": {\n            \"description\": \"Folic acid\",\n            \"unit\": \"µg\",\n            \"value\": 0\n        },\n        \"CHOLE\": {\n            \"description\": \"Cholesterol\",\n            \"unit\": \"mg\",\n            \"value\": 0\n        },\n        \"FATRN\": {\n            \"description\": \"Fatty acids, total trans\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"FASAT\": {\n            \"description\": \"Fatty acids, total saturated\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"FAMS\": {\n            \"description\": \"Fatty acids, total monounsaturated\",\n            \"unit\": \"g\",\n            \"value\": 0\n        },\n        \"FAPU\": {\n            \"description\": \"Fatty acids, total polyunsaturated\",\n            \"unit\": \"g\",\n            \"value\": 0\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/recipes/201f75ed-111e-4fb9-ae54-3dafaca8c5c1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes",
+								"201f75ed-111e-4fb9-ae54-3dafaca8c5c1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Recipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYW1zYXlAcmFtc2F5LmNvbSIsImlhdCI6MTU2NDMxMTk0NCwiZXhwIjoxNTY0OTE2NzQ0fQ.nQiMuRa-RgxenZLeBZp_UMRYJ1KOReCGBibwwt0Cs64",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/recipes/201f75ed-111e-4fb9-ae54-3dafaca8c5c1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recipes",
+								"201f75ed-111e-4fb9-ae54-3dafaca8c5c1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get User By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyQHBldGVyLmNvbSIsImlhdCI6MTU2NDMxMzgxOSwiZXhwIjoxNTY0OTE4NjE5fQ.C2PIG_HRrRjM4lMrmDvEbTFiJIGF9nBOS_MtoLZPRWI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/users/7c659256-2157-4f96-b7e5-0f2cc33e8471",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"7c659256-2157-4f96-b7e5-0f2cc33e8471"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

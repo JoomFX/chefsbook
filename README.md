@@ -13,7 +13,7 @@
 Final Project Assignment for Telerik Academy Aplpha with JavaScript - Design and implement single-page web application that will allow restaurant chefs to create and manage recipes composed of products with known nutrition values. During the interaction with the system users should see changes in nutrition information in real time. Newly created recipes could be tagged with a category from a list.
 
 
-### User Stories - Project Timeline
+### Project Features
 
 - Authenticate users - Register, Login, Logout
 - Users can CRUD recipes
@@ -59,7 +59,9 @@ MariaDb database settings are in `ormconfig.json`.
 
 Start local MariaDB server and create new database 'recipes_db'.
 
-You will need a `.env` file as. You can modify the one included in the project.
+You will need a `.env` file as well. You can modify the one included in the project.
+
+You will also need to import the Sample Data (Products Database). All you need to do is to run `npm run seed`.
 
 
 ## NPM scripts
@@ -71,3 +73,7 @@ You will need a `.env` file as. You can modify the one included in the project.
 - `npm run test` - run Jest test runner
 
 ----------
+
+# Documentation
+
+There is a folder called `documentation` where you can find an exported Postman Collection with all endpoints.
